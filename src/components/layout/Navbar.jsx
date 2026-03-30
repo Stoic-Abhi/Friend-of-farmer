@@ -1,4 +1,8 @@
+import { useCart } from "../../context/CartContext";
+
 export default function Navbar() {
+  const { cartCount } = useCart();
+
   return (
     <nav className="nav">
       <div className="nav-logo">
@@ -13,7 +17,9 @@ export default function Navbar() {
       </div>
 
       <div className="nav-actions">
-        <button className="btn-outline">🛒 Cart</button>
+        <button className="btn-outline">
+          🛒 Cart <span className="cart-count">{cartCount}</span>
+        </button>
         <button className="btn-primary">Sign In</button>
       </div>
     </nav>

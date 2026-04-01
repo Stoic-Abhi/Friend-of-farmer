@@ -1,18 +1,150 @@
-# React + Vite
+# FarmDirect — Field to Table Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+FarmDirect is a full-stack web application designed to **connect farmers directly with consumers**, eliminating middlemen and ensuring **fair pricing, transparency, and fresh produce delivery**.
 
-Currently, two official plugins are available:
+The platform enables farmers to list their harvest and consumers to browse, filter, and purchase products directly — creating a **digital farm-to-table ecosystem**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### Consumer Side
 
-Note: This will impact Vite dev & build performances.
+* Browse fresh produce from local farmers
+* Search, filter, and sort products
+* Add items to cart
+* Dynamic cart with quantity control
+* Order tracking UI (dashboard ready)
 
-## Expanding the ESLint configuration
+### Farmer Side
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* Farmer dashboard with:
+
+  * Earnings overview
+  * Order tracking
+  * Inventory status
+* Add and manage product listings
+* View recent orders
+
+### ⚙️ Core Functionalities
+
+* Real-time product filtering & sorting
+* Global state management (Cart system)
+* Modular component-based UI
+* Responsive and clean UI design
+
+---
+
+## 🧠 Problem Statement
+
+Traditional agricultural supply chains involve multiple intermediaries, which:
+
+* Reduce farmers' profit margins
+* Increase prices for consumers
+* Reduce transparency
+
+FarmDirect solves this by:
+
+> Enabling **direct farmer-to-consumer transactions** through a digital platform.
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+
+*  React (Vite)
+*  Component-Based Architecture
+*  Context API (State Management)
+*  CSS (Modular + Variables)
+
+### Backend *(Extendable)*
+
+*  Node.js + Express
+* MongoDB
+* REST APIs
+
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── components/        # Reusable UI components
+├── pages/             # Page-level components
+├── context/           # Global state (Cart, etc.)
+├── data/              # Static/mock data
+├── styles/            # Global styles & variables
+├── App.jsx
+└── main.jsx
+```
+
+---
+
+##  Getting Started
+
+###  Clone the Repository
+
+```bash
+git clone https://github.com/your-username/farmdirect.git
+cd farmdirect
+```
+
+###  Install Dependencies
+
+```bash
+npm install
+```
+
+###  Run Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧑‍💻 How to Contribute
+
+If you’d like to contribute:
+
+1. Fork the repository
+2. Create a new branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+3. Make changes and commit
+
+```bash
+git commit -m "Added new feature"
+```
+
+4. Push to your fork
+
+```bash
+git push origin feature/your-feature-name
+```
+
+5. Create a Pull Request 🚀
+
+---
+
+## 🙌 Acknowledgements
+
+This project is part of a larger vision to:
+
+> Empower farmers using technology and build a **sustainable digital agriculture ecosystem**.
+
+---
+
+## 📬 Contact
+
+**Abhishek Pandey**
+Feel free to connect or contribute!
+
+---
+
+⭐ If you like this project, consider giving it a star!

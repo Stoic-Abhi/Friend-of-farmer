@@ -1,6 +1,6 @@
 import { useCart } from "../../context/CartContext";
 
-export default function Navbar() {
+export default function Navbar({ onCartClick }) {
   const { cartCount } = useCart();
 
   return (
@@ -9,18 +9,10 @@ export default function Navbar() {
         🌾 Farm<span>Direct</span>
       </div>
 
-      <div className="nav-links">
-        <a>Browse</a>
-        <a>Farmer Dashboard</a>
-        <a>My Orders</a>
-        <a>List Produce</a>
-      </div>
-
       <div className="nav-actions">
-        <button className="btn-outline">
+        <button className="btn-outline" onClick={onCartClick}>
           🛒 Cart <span className="cart-count">{cartCount}</span>
         </button>
-        <button className="btn-primary">Sign In</button>
       </div>
     </nav>
   );

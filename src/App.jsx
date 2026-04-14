@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Navbar from "./components/layout/Navbar";
 import RoleTabs from "./components/layout/RoleTabs";
-import BrowsePage from "./pages/Browse/BrowsePage";
 import CartDrawer from "./components/cart/CartDrawer";
+import AppRoutes from "./routes";
 
 export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -11,7 +11,8 @@ export default function App() {
     <>
       <Navbar onCartClick={() => setCartOpen(true)} />
       <RoleTabs />
-      <BrowsePage />
+
+      <AppRoutes />
 
       <CartDrawer
         isOpen={cartOpen}

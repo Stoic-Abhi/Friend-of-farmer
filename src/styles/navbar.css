@@ -1,0 +1,29 @@
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: linear-gradient(90deg, #2C1810, #5C3D2E);
+  color: white;
+}
+
+.nav-links a {
+  margin: 0 16px;
+  color: #F5DEB3;
+  text-decoration: none;
+}
+
+.cart-btn {
+  border: 1px solid #D4A853;
+  background: transparent;
+  color: #D4A853;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+
+.sign-btn {
+  background: #8BC34A;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+}

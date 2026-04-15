@@ -6,7 +6,12 @@ export default function Navbar({ onCartClick }) {
 
   return (
     <nav className="nav">
-      <div className="nav-logo">🌾 Farm<span>Direct</span></div>
+      <div className="nav-left">
+        <span className="logo-icon">🌾</span>
+        <span className="logo-text">
+          <strong>Farm</strong> <span>Direct</span>
+        </span>
+      </div>
 
       <div className="nav-links">
         <Link to="/">Browse</Link>
@@ -15,9 +20,12 @@ export default function Navbar({ onCartClick }) {
         <Link to="/list">List Produce</Link>
       </div>
 
-      <button onClick={onCartClick}>
-        🛒 {cartCount}
-      </button>
+      <div className="nav-actions">
+        <button className="cart-btn" onClick={onCartClick}>
+          🛒 Cart <span className="cart-count">{cartCount}</span>
+        </button>
+        <button className="sign-btn">Sign In</button>
+      </div>
     </nav>
   );
 }

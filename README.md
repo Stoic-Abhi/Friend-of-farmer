@@ -49,7 +49,7 @@ FarmDirect solves this by:
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 
@@ -105,7 +105,7 @@ npm run dev
 
 ---
 
-## 🧑‍💻 How to Contribute
+##  How to Contribute
 
 If you’d like to contribute:
 
@@ -128,11 +128,11 @@ git commit -m "Added new feature"
 git push origin feature/your-feature-name
 ```
 
-5. Create a Pull Request 🚀
+5. Create a Pull Request 
 
 ---
 
-## 🙌 Acknowledgements
+##  Acknowledgements
 
 This project is part of a larger vision to:
 

@@ -1,30 +1,38 @@
-import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+/**
+ * src/components/layout/Navbar.jsx
+ *
+ * Sticky top navigation bar.
+ * Receives `onNavigate` and `onCartOpen` to stay decoupled from router.
+ * When react-router is added, replace `onNavigate` calls with <Link> or useNavigate().
+ */
 
-export default function Navbar({ onCartClick }) {
-  const { cartCount } = useCart();
+import { useCart } from '../../context/CartContext';
+
+export default function Navbar({ onNavigate, onCartOpen }) {
+  const { totalCount } = useCart();
 
   return (
-    <nav className="nav">
-      <div className="nav-left">
-        <span className="logo-icon">🌾</span>
-        <span className="logo-text">
-          <strong>Farm</strong> <span>Direct</span>
-        </span>
+    <nav className="navbar">
+      {/* Logo */}
+      <div className="nav-logo" onClick={() => onNavigate('browse')} style={{ cursor: 'pointer' }}>
+        🌾 Farm<span>Direct</span>
       </div>
 
+      {/* Links */}
       <div className="nav-links">
-        <Link to="/">Browse</Link>
-        <Link to="/farmer">Farmer Dashboard</Link>
-        <Link to="/orders">My Orders</Link>
-        <Link to="/list">List Produce</Link>
+        <button onClick={() => onNavigate('browse')}>Browse</button>
+        <button onClick={() => onNavigate('farmer-dash')}>Farmer Dashboard</button>
+        <button onClick={() => onNavigate('consumer-dash')}>My Orders</button>
+        <button onClick={() => onNavigate('list-product')}>List Produce</button>
       </div>
 
+      {/* Actions */}
       <div className="nav-actions">
-        <button className="cart-btn" onClick={onCartClick}>
-          🛒 Cart <span className="cart-count">{cartCount}</span>
+        <button className="btn-outline" onClick={onCartOpen}>
+          🛒 Cart
+          {totalCount > 0 && <span className="cart-count">{totalCount}</span>}
         </button>
-        <button className="sign-btn">Sign In</button>
+        <button className="btn-primary">Sign In</button>
       </div>
     </nav>
   );

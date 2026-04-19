@@ -1,10 +1,32 @@
-export default function RoleTabs() {
+/**
+ * src/components/layout/RoleTabs.jsx
+ *
+ * Horizontal role-selector tab bar below the Navbar.
+ * Driven by a config array so adding a new tab is a one-liner.
+ */
+
+const TABS = [
+  { id: 'browse',        label: '🌿 Browse Produce' },
+  { id: 'farmer-dash',   label: '🚜 Farmer Dashboard' },
+  { id: 'list-product',  label: '📋 List My Produce' },
+  { id: 'consumer-dash', label: '📦 My Orders' },
+];
+
+/**
+ * @param {{ activeView: string, onNavigate: (id: string) => void }} props
+ */
+export default function RoleTabs({ activeView, onNavigate }) {
   return (
     <div className="role-bar">
-      <button className="role-tab active">🌿 Browse Produce</button>
-      <button className="role-tab">🚜 Farmer Dashboard</button>
-      <button className="role-tab">📋 List My Produce</button>
-      <button className="role-tab">📦 My Orders</button>
+      {TABS.map(tab => (
+        <button
+          key={tab.id}
+          className={`role-tab${activeView === tab.id ? ' active' : ''}`}
+          onClick={() => onNavigate(tab.id)}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }

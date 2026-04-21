@@ -1,20 +1,18 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./styles/global.css";
-import { CartProvider } from "./context/CartContext";
-import { BrowserRouter } from "react-router-dom";  // ✅ ADD THIS
-import "./styles/navbar.css";
-import "./styles/hero.css";
-import "./styles/product.css";
-import "./styles/dashboard.css";
+/**
+ * src/main.jsx
+ *
+ * React application entry point.
+ * Mounts <App> into #root and imports global styles.
+ */
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>   {/* ✅ WRAP HERE */}
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import './index.css';
+import App from './App';
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
 );

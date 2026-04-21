@@ -1,0 +1,324 @@
+/* ─────────────────────────────────────────────
+   Dashboard – Farmer & Consumer
+───────────────────────────────────────────── */
+
+/* ── Shared dashboard wrapper ── */
+.dashboard,
+.consumer-dash {
+  padding: var(--page-px);
+}
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.dash-greeting {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--soil);
+}
+
+.dash-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* ── KPI cards grid ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  border-left: 4px solid var(--straw);
+  transition: transform 0.2s;
+}
+.kpi-card:hover { transform: translateY(-2px); }
+.kpi-card.green { border-left-color: var(--sprout); }
+.kpi-card.clay  { border-left-color: var(--clay); }
+.kpi-card.blue  { border-left-color: var(--sky); }
+
+.kpi-icon  { font-size: 1.75rem; margin-bottom: 0.5rem; display: block; }
+.kpi-val   { font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; color: var(--soil); }
+.kpi-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.kpi-trend { font-size: 0.75rem; font-weight: 600; margin-top: 6px; }
+.kpi-trend.up   { color: var(--leaf); }
+.kpi-trend.down { color: #c0392b; }
+
+/* ── Two-column layout ── */
+.dash-cols {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+}
+
+/* ── Panel card ── */
+.dash-panel {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1.5px solid #f0e8e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-title  { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--soil); }
+.panel-action { font-size: 0.8rem; color: var(--clay); font-weight: 500; cursor: pointer; }
+.panel-action:hover { text-decoration: underline; }
+
+/* ── Order list rows ── */
+.order-list { padding: 0.5rem; }
+
+.order-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.order-row:hover { background: var(--cream); }
+
+.order-emoji { font-size: 1.6rem; flex-shrink: 0; }
+.order-info  { flex: 1; min-width: 0; }
+.order-name  { font-size: 0.875rem; font-weight: 600; color: var(--soil); }
+.order-detail{ font-size: 0.75rem;  color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-amt   { font-weight: 700; color: var(--leaf); font-size: 0.9rem; white-space: nowrap; }
+
+/* ── Inventory bars ── */
+.inventory-list { padding: 0.5rem; }
+
+.inv-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.inv-row:hover { background: var(--cream); }
+
+.inv-emoji { font-size: 1.4rem; flex-shrink: 0; }
+.inv-info  { flex: 1; min-width: 0; }
+.inv-name  { font-size: 0.85rem; font-weight: 600; color: var(--soil); }
+
+.inv-bar-wrap {
+  height: 5px;
+  background: #f0e8e0;
+  border-radius: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+.inv-bar     { height: 100%; border-radius: 3px; background: var(--sprout); transition: width 0.4s ease; }
+.inv-bar.low { background: #e67e22; }
+
+.inv-qty { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+/* ── Consumer: Order history ── */
+.order-history { display: grid; gap: 1rem; }
+
+.history-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.history-card-top {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #f0e8e0;
+  background: var(--cream);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.history-id   { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.history-date { font-size: 0.8rem; color: var(--muted); }
+
+.history-body {
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.history-items  { flex: 1; font-size: 1.5rem; letter-spacing: 4px; }
+.history-farmer { font-size: 0.825rem; color: var(--earth); }
+.history-farmer strong { color: var(--soil); }
+.history-total  { font-size: 1.1rem; font-weight: 700; color: var(--leaf); white-space: nowrap; }
+
+/* ── Order tracking bar ── */
+.tracking-bar {
+  padding: 1rem 1.5rem;
+  border-top: 1.5px solid #f0e8e0;
+}
+
+.track-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Connector line */
+.track-steps::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: #e8ddd5;
+  z-index: 0;
+}
+
+.track-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.track-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #e8ddd5;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+}
+.track-dot.done   { border-color: var(--leaf); background: var(--leaf); color: white; }
+.track-dot.active { border-color: var(--straw); background: var(--straw); color: var(--soil); }
+
+.track-lbl      { font-size: 0.65rem; color: var(--muted); font-weight: 500; }
+.track-lbl.done { color: var(--leaf); font-weight: 600; }
+
+/* ── Saved Farmers grid ── */
+.saved-farmers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.farmer-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid transparent;
+}
+.farmer-card:hover { border-color: var(--sage); transform: translateY(-2px); }
+
+.farmer-avatar { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.farmer-name   { font-weight: 700; color: var(--soil); font-size: 0.9rem; }
+.farmer-loc    { font-size: 0.75rem; color: var(--muted); margin: 2px 0; }
+.farmer-rating { font-size: 0.8rem; color: var(--straw); margin-top: 4px; }
+
+.farmer-badge {
+  font-size: 0.68rem;
+  background: var(--status-delivered-bg);
+  color: var(--status-delivered-fg);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ── List-product form ── */
+.listing-section { padding: var(--page-px); }
+
+.form-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 2rem;
+  max-width: 680px;
+}
+
+.form-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 900; color: var(--soil); margin-bottom: 0.25rem; }
+.form-sub   { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.75rem; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group      { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--earth);
+  letter-spacing: 0.3px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  border: 1.5px solid #e8ddd5;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--cream);
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus { border-color: var(--leaf); background: white; }
+
+.form-textarea { resize: vertical; min-height: 80px; }
+
+.toggle-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+.img-upload {
+  border: 2px dashed var(--sage);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f7fbf5;
+}
+.img-upload:hover { border-color: var(--leaf); background: #eff8ed; }
+
+.img-upload-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+.img-upload-text { font-size: 0.875rem; color: var(--muted); }
+
+.form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }

@@ -1,0 +1,62 @@
+/* ─────────────────────────────────────────────
+   FarmDirect Design Tokens
+   All CSS custom properties live here.
+   Import this file first in every other stylesheet.
+───────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  /* ── Colour Palette ── */
+  --soil:   #2C1810;
+  --earth:  #5C3D2E;
+  --clay:   #A0522D;
+  --straw:  #D4A853;
+  --wheat:  #F5DEB3;
+  --sage:   #6B8E5A;
+  --leaf:   #4A7C3F;
+  --sprout: #8BC34A;
+  --sky:    #B8D4E8;
+  --cream:  #FAF6F0;
+  --white:  #FFFFFF;
+  --ink:    #1A1208;
+  --muted:  #8C7B6B;
+
+  /* ── Status Colours ── */
+  --status-pending-bg:   #fff3cd;
+  --status-pending-fg:   #856404;
+  --status-packed-bg:    #cce5ff;
+  --status-packed-fg:    #004085;
+  --status-delivered-bg: #d4edda;
+  --status-delivered-fg: #155724;
+
+  /* ── Freshness Colours ── */
+  --fresh-bg:  #d4edda;
+  --fresh-fg:  #155724;
+  --recent-bg: #fff3cd;
+  --recent-fg: #856404;
+
+  /* ── Elevation ── */
+  --shadow-card:  0 4px 24px rgba(44, 24, 16, 0.10);
+  --shadow-hover: 0 12px 32px rgba(44, 24, 16, 0.15);
+  --shadow-cart:  -8px 0 40px rgba(44, 24, 16, 0.20);
+
+  /* ── Shape ── */
+  --radius:    16px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-pill: 100px;
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* ── Spacing ── */
+  --page-px: 2.5rem;
+  --page-py: 60px;
+
+  /* ── Z-index layers ── */
+  --z-nav:   100;
+  --z-cart:  200;
+  --z-toast: 999;
+}

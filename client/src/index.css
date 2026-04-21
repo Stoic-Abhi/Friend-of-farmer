@@ -1,0 +1,11 @@
+/* ─────────────────────────────────────────────
+   FarmDirect — Master Stylesheet
+   Import order matters: variables → global → modules
+───────────────────────────────────────────── */
+
+@import './styles/variables.css';
+@import './styles/global.css';
+@import './styles/navbar.css';
+@import './styles/hero.css';
+@import './styles/product.css';
+@import './styles/dashboard.css';

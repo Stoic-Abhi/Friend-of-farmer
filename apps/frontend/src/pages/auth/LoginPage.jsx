@@ -1,15 +1,3 @@
-/**
- * src/pages/ConsumerDashboard/ConsumerDashboardPage.jsx
- *
- * Consumer's personal dashboard: order history + saved farmers.
- *
- * Future wiring:
- *   - Replace SEED_ORDERS with GET /api/consumer/:id/orders
- *   - Replace SEED_FARMERS with GET /api/consumer/:id/saved-farmers
- *   - Each history card gets a real-time status from WebSocket / polling
- *   - Wrap in <RequireAuth role="consumer"> guard
- */
-
 import { useNavigate }     from 'react-router-dom';
 import { useAuth }         from '../../context/AuthContext.jsx';
 import { useFarmerStats }  from '../../hooks/useFarmerStats.js';

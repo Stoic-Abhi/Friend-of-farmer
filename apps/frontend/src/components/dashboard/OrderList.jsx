@@ -7,18 +7,9 @@
  * @param {{ orders: Array, title?: string }} props
  */
 
-import OrderCard from './OrderCard';
+import OrderCard from './OrderCard.jsx';
 
-/** Static seed — replace with API response */
-const SEED_ORDERS = [
-  { id: 1, emoji: '🍅', name: 'Tomatoes × 10 kg',  detail: 'Priya Sharma · Bengaluru · 2 hrs ago',  status: 'pending',   amount: '₹280'   },
-  { id: 2, emoji: '🥦', name: 'Broccoli × 3 kg',   detail: 'Amit Verma · Mysuru · 5 hrs ago',        status: 'packed',    amount: '₹390'   },
-  { id: 3, emoji: '🌾', name: 'Ragi × 25 kg',       detail: 'Sunita Rao · Tumkur · Yesterday',        status: 'delivered', amount: '₹1,250' },
-  { id: 4, emoji: '🧅', name: 'Onions × 20 kg',    detail: 'Ramesh K · Hassan · Yesterday',           status: 'delivered', amount: '₹700'   },
-  { id: 5, emoji: '🥕', name: 'Carrots × 8 kg',    detail: 'Meena Iyer · Bengaluru · 2 days ago',    status: 'delivered', amount: '₹560'   },
-];
-
-export default function OrderList({ orders = SEED_ORDERS, title = 'Recent Orders' }) {
+export default function OrderList({ orders = [], isLoading, title = 'Recent Orders' }) {
   return (
     <div className="dash-panel">
       <div className="panel-header">
@@ -26,9 +17,24 @@ export default function OrderList({ orders = SEED_ORDERS, title = 'Recent Orders
         <span className="panel-action">View All →</span>
       </div>
       <div className="order-list">
-        {orders.map(order => (
-          <OrderCard key={order.id} {...order} />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="order-row" style={{ gap: '1rem' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#f0ebe5' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ height: 14, background: '#f0ebe5', borderRadius: 4, marginBottom: 6 }} />
+                <div style={{ height: 11, background: '#f5f0eb', borderRadius: 4, width: '60%' }} />
+              </div>
+            </div>
+          ))
+        ) : orders.length === 0 ? (
+          <div className="empty" style={{ padding: '2rem' }}>
+            <span className="empty-icon" style={{ fontSize: '2rem' }}>📦</span>
+            No orders yet.
+          </div>
+        ) : (
+          orders.map(order => <OrderCard key={order.id} {...order} />)
+        )}
       </div>
     </div>
   );

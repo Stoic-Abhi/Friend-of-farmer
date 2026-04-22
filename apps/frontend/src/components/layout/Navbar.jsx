@@ -5,34 +5,50 @@
  * Receives `onNavigate` and `onCartOpen` to stay decoupled from router.
  * When react-router is added, replace `onNavigate` calls with <Link> or useNavigate().
  */
+import { useNavigate } from 'react-router-dom';
+import { useCart }     from '../../context/CartContext.jsx';
+import { useAuth }     from '../../context/AuthContext.jsx';
 
-import { useCart } from '../../context/CartContext';
-
-export default function Navbar({ onNavigate, onCartOpen }) {
-  const { totalCount } = useCart();
+export default function Navbar({ onCartOpen }) {
+  const { totalCount }         = useCart();
+  const { isLoggedIn, user, logout } = useAuth();
+  const navigate               = useNavigate();
 
   return (
     <nav className="navbar">
-      {/* Logo */}
-      <div className="nav-logo" onClick={() => onNavigate('browse')} style={{ cursor: 'pointer' }}>
+      <div className="nav-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
         🌾 Farm<span>Direct</span>
       </div>
 
-      {/* Links */}
       <div className="nav-links">
-        <button onClick={() => onNavigate('browse')}>Browse</button>
-        <button onClick={() => onNavigate('farmer-dash')}>Farmer Dashboard</button>
-        <button onClick={() => onNavigate('consumer-dash')}>My Orders</button>
-        <button onClick={() => onNavigate('list-product')}>List Produce</button>
+        <button onClick={() => navigate('/browse')}>Browse</button>
+        {isLoggedIn && user?.role === 'FARMER' && (
+          <>
+            <button onClick={() => navigate('/farmer/dashboard')}>Dashboard</button>
+            <button onClick={() => navigate('/list-product')}>List Produce</button>
+          </>
+        )}
+        {isLoggedIn && user?.role === 'CONSUMER' && (
+          <button onClick={() => navigate('/orders')}>My Orders</button>
+        )}
       </div>
 
-      {/* Actions */}
       <div className="nav-actions">
-        <button className="btn-outline" onClick={onCartOpen}>
-          🛒 Cart
-          {totalCount > 0 && <span className="cart-count">{totalCount}</span>}
-        </button>
-        <button className="btn-primary">Sign In</button>
+        {isLoggedIn && user?.role === 'CONSUMER' && (
+          <button className="btn-outline" onClick={onCartOpen}>
+            🛒 Cart
+            {totalCount > 0 && <span className="cart-count">{totalCount}</span>}
+          </button>
+        )}
+
+        {isLoggedIn ? (
+          <button className="btn-outline" onClick={logout}>Sign Out</button>
+        ) : (
+          <>
+            <button className="btn-outline" onClick={() => navigate('/login')}>Sign In</button>
+            <button className="btn-primary" onClick={() => navigate('/signup')}>Sign Up</button>
+          </>
+        )}
       </div>
     </nav>
   );

@@ -8,71 +8,78 @@
  * the backend starts serving image URLs.
  */
 
-import { useCart } from '../../context/CartContext';
-import { useToast } from '../../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
+import { useCart }     from '../../context/CartContext.jsx';
+import { useToast }    from '../../context/ToastContext.jsx';
+import { useAuth }     from '../../context/AuthContext.jsx';
 
-/**
- * @param {{ product: import('../../data/products').Product }} props
- */
+const CATEGORY_EMOJI = { VEG:'🥬', FRUIT:'🍅', GRAIN:'🌾', HERB:'🌿', DAIRY:'🥛' };
+const CAT_BG         = { VEG:'#f0f8ee', FRUIT:'#fff0ee', GRAIN:'#fdf8ee', HERB:'#f5fbf5', DAIRY:'#f0f4ff' };
+
+function freshnessLabel(days) {
+  if (days === 0) return '🌟 Just Harvested';
+  if (days === 1) return '✨ 1 day ago';
+  return `📅 ${days} days ago`;
+}
+
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart();
-  const { showToast } = useToast();
+  const { addToCart }  = useCart();
+  const { showToast }  = useToast();
+  const { user }       = useAuth();
+  const navigate       = useNavigate();
 
-  const freshnessClass = product.harvest <= 1 ? 'fresh' : 'recent';
-  const freshnessLabel =
-    product.harvest === 0
-      ? '🌟 Just Harvested'
-      : product.harvest === 1
-      ? '✨ 1 day ago'
-      : `📅 ${product.harvest} days ago`;
+  // Normalise API shape vs seed shape
+  const price      = product.pricePerKg  ?? product.price;
+  const days       = product.harvestDays ?? product.harvest ?? 0;
+  const rating     = product.avgRating   ?? product.rating;
+  const reviews    = product.reviewCount ?? product.reviews;
+  const isOrganic  = product.isOrganic   ?? product.organic;
+  const hasDelivery= product.delivery === 'SELF' || product.delivery === 'BOTH' || product.delivery === true;
+  const catKey     = (product.category ?? 'VEG').toUpperCase();
+  const emoji      = CATEGORY_EMOJI[catKey] ?? '🌾';
+  const bg         = product.bg ?? CAT_BG[catKey] ?? '#fdf8ee';
+  const farmerName = product.farmer?.email ?? product.farmer ?? '';
+  const location   = product.district ?? product.loc ?? '';
 
   function handleAddToCart(e) {
-    e.stopPropagation(); // prevent card click bubbling
-    addToCart(product);
-    showToast(`🛒 ${product.emoji} ${product.name} added to cart!`);
+    e.stopPropagation();
+    if (user?.role === 'FARMER') { showToast('⚠️ Farmers cannot place orders.'); return; }
+    addToCart({ ...product, emoji, pricePerKg: price, price });
+    showToast(`🛒 ${emoji} ${product.name} added to cart!`);
   }
 
   return (
-    <div className="product-card">
-      {/* Thumbnail */}
-      <div className="product-img" style={{ background: product.bg }}>
-        <span className="product-img-emoji">{product.emoji}</span>
-        {product.organic && <div className="organic-badge">Organic</div>}
-        <div className={`freshness-badge ${freshnessClass}`}>{freshnessLabel}</div>
+    <div className="product-card" onClick={() => navigate(`/products/${product.id}`)}>
+      <div className="product-img" style={{ background: bg }}>
+        <span className="product-img-emoji">{emoji}</span>
+        {isOrganic && <div className="organic-badge">Organic</div>}
+        <div className={`freshness-badge ${days <= 1 ? 'fresh' : 'recent'}`}>
+          {freshnessLabel(days)}
+        </div>
       </div>
 
-      {/* Details */}
       <div className="product-body">
         <div className="product-name">{product.name}</div>
         <div className="product-farmer">
-          by <a href="#">{product.farmer}</a> · {product.loc}
+          by <a onClick={e => { e.stopPropagation(); }}>{farmerName}</a>
+          {location && ` · ${location}`}
         </div>
-
-        <div className="rating-row">
-          <span className="stars">{'⭐'.repeat(Math.round(product.rating))}</span>
-          <span className="rating-count">
-            {product.rating} ({product.reviews})
-          </span>
-        </div>
-
+        {rating && (
+          <div className="rating-row">
+            <span className="stars">{'⭐'.repeat(Math.round(rating))}</span>
+            <span className="rating-count">{rating} ({reviews})</span>
+          </div>
+        )}
         <div className="product-meta">
-          <div className="product-price">
-            ₹{product.price} <span>/ kg</span>
-          </div>
-          <div className="product-loc">
-            {product.delivery ? '🚚 Delivery' : '🏪 Pickup'}
-          </div>
+          <div className="product-price">₹{price} <span>/ kg</span></div>
+          <div className="product-loc">{hasDelivery ? '🚚 Delivery' : '🏪 Pickup'}</div>
         </div>
-
-        <div className="product-avail">📦 {product.qty} available</div>
+        <div className="product-avail">📦 {product.quantityKg ?? product.qty} kg available</div>
       </div>
 
-      {/* Actions */}
       <div className="product-footer">
-        <button className="add-cart-btn" onClick={handleAddToCart}>
-          Add to Cart
-        </button>
-        <button className="wishlist-btn" aria-label="Save to wishlist">♡</button>
+        <button className="add-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
+        <button className="wishlist-btn" onClick={e => e.stopPropagation()} aria-label="Save">♡</button>
       </div>
     </div>
   );

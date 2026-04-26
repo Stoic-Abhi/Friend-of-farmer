@@ -22,47 +22,84 @@
  * Then replace every `onNavigate(id)` call with `useNavigate()(path)`.
  * ─────────────────────────────────────────────────────────────
  */
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { useAuth }  from './context/AuthContext.jsx';
+import App          from './App.jsx';
+import PrivateRoute from './components/auth/PrivateRoute.jsx';
 
-import BrowsePage             from './pages/Browse/BrowsePage';
-import FarmerDashboardPage    from './pages/FarmerDashboard/FarmerDashboardPage';
-import ListProductPage        from './pages/ListProduct/ListProductPage';
-import ConsumerDashboardPage  from './pages/ConsumerDashboard/ConsumerDashboardPage';
+// Auth pages
+import LoginPage      from './pages/auth/LoginPage.jsx';
+import SignupPage     from './pages/auth/SignupPage.jsx';
+import VerifyOtpPage  from './pages/auth/VerifyOtpPage.jsx';
+import SelectRolePage from './pages/auth/SelectRolePage.jsx';
 
-/**
- * @typedef {{
- *   id:        string,
- *   path:      string,
- *   label:     string,
- *   component: React.ComponentType<any>,
- * }} RouteConfig
- */
+// App pages
+import BrowsePage            from './pages/Browse/BrowsePage.jsx';
+import FarmerDashboardPage   from './pages/FarmerDashboard/FarmerDashboardPage.jsx';
+import ConsumerDashboardPage from './pages/ConsumerDashboard/ConsumerDashboardPage.jsx';
+import ListProductPage       from './pages/ListProduct/ListProductPage.jsx';
 
-/** @type {RouteConfig[]} */
-export const ROUTES = [
-  {
-    id:        'browse',
-    path:      '/',
-    label:     'Browse',
-    component: BrowsePage,
-  },
-  {
-    id:        'farmer-dash',
-    path:      '/farmer/dashboard',
-    label:     'Farmer Dashboard',
-    component: FarmerDashboardPage,
-  },
-  {
-    id:        'list-product',
-    path:      '/farmer/list',
-    label:     'List Produce',
-    component: ListProductPage,
-  },
-  {
-    id:        'consumer-dash',
-    path:      '/orders',
-    label:     'My Orders',
-    component: ConsumerDashboardPage,
-  },
-];
+function DashboardRedirect() {
+  const { user } = useAuth();
+  if (user?.role === 'FARMER')   return <Navigate to="/farmer/dashboard" replace />;
+  if (user?.role === 'CONSUMER') return <Navigate to="/browse" replace />;
+  return <Navigate to="/select-role" replace />;
+}
 
-export const DEFAULT_ROUTE_ID = 'browse';
+export const router = createBrowserRouter([
+  // Public auth
+  { path: '/login',      element: <LoginPage /> },
+  { path: '/signup',     element: <SignupPage /> },
+  { path: '/verify-otp', element: <VerifyOtpPage /> },
+
+  // Needs login but no role yet
+  {
+    path: '/select-role',
+    element: (
+      <PrivateRoute skipRoleCheck>
+        <SelectRolePage />
+      </PrivateRoute>
+    ),
+  },
+
+  // Protected app shell
+  {
+    path: '/',
+    element: (
+      <PrivateRoute>
+        <App />
+      </PrivateRoute>
+    ),
+    children: [
+      { index: true,         element: <DashboardRedirect /> },
+      { path: 'dashboard',   element: <DashboardRedirect /> },
+      { path: 'browse',      element: <BrowsePage /> },
+      {
+        path: 'farmer/dashboard',
+        element: (
+          <PrivateRoute requireRole="FARMER">
+            <FarmerDashboardPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'list-product',
+        element: (
+          <PrivateRoute requireRole="FARMER">
+            <ListProductPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'orders',
+        element: (
+          <PrivateRoute requireRole="CONSUMER">
+            <ConsumerDashboardPage />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+
+  { path: '*', element: <Navigate to="/" replace /> },
+]);

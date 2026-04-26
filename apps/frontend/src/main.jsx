@@ -5,14 +5,17 @@
  * Mounts <App> into #root and imports global styles.
  */
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-
+import { StrictMode }     from 'react';
+import { createRoot }     from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider }   from './context/AuthContext.jsx';
+import { router }         from './routes.jsx';
 import './index.css';
-import App from './App';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );

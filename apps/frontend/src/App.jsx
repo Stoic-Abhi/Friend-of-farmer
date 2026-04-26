@@ -16,53 +16,34 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { useState } from 'react';
-
-import { CartProvider }  from './context/CartContext';
-import { ToastProvider } from './context/ToastContext';
-
-import Navbar      from './components/layout/Navbar';
-import RoleTabs    from './components/layout/RoleTabs';
-import CartDrawer  from './components/cart/CartDrawer';
-
-import { ROUTES, DEFAULT_ROUTE_ID } from './routes';
+// src/App.jsx — authenticated shell layout
+import { useState }    from 'react';
+import { Outlet }      from 'react-router-dom';
+import { useAuth }     from './context/AuthContext.jsx';
+import { CartProvider } from './context/CartContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
+import Navbar           from './components/layout/Navbar.jsx';
+import RoleTabs         from './components/layout/RoleTabs.jsx';
+import CartDrawer       from './components/cart/CartDrawer.jsx';
 
 export default function App() {
-  const [activeView,  setActiveView]  = useState(DEFAULT_ROUTE_ID);
-  const [cartOpen,    setCartOpen]    = useState(false);
-
-  /** Resolve the active route's page component */
-  const ActivePage = ROUTES.find(r => r.id === activeView)?.component ?? ROUTES[0].component;
+  const [cartOpen, setCartOpen] = useState(false);
+  const { user }  = useAuth();
 
   return (
     <CartProvider>
       <ToastProvider>
-        {/* ── Persistent layout ── */}
-        <Navbar
-          onNavigate={setActiveView}
-          onCartOpen={() => setCartOpen(true)}
-        />
-        <RoleTabs
-          activeView={activeView}
-          onNavigate={setActiveView}
-        />
-
-        {/* ── Page area ── */}
+        <Navbar onCartOpen={() => setCartOpen(true)} />
+        <RoleTabs />
         <main>
-          {/*
-            Pass onNavigate so pages can trigger cross-page navigation
-            (e.g. Hero CTA → ListProductPage).
-            With React Router this becomes useNavigate() inside each page.
-          */}
-          <ActivePage onNavigate={setActiveView} />
+          <Outlet />
         </main>
-
-        {/* ── Global cart drawer ── */}
-        <CartDrawer
-          isOpen={cartOpen}
-          onClose={() => setCartOpen(false)}
-        />
+        {/* Only mount cart drawer for consumers */}
+        {user?.role === 'CONSUMER' && (
+          <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+        )}
       </ToastProvider>
     </CartProvider>
   );
 }
+

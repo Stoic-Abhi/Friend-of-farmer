@@ -1,24 +1,24 @@
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
+// src/index.js
+// Server boot — loads env, connects DB, starts listening.
 
-dotenv.config();
+import 'dotenv/config';
+import app    from './app.js';
+import prisma from './config/prisma.js';
 
-const app = express();
-const port = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT ?? 4000);
 
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
+async function main() {
+  // Verify DB connection
+  await prisma.$connect();
+  console.info('✅ PostgreSQL connected via Prisma');
 
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    service: "backend",
-    status: "ok",
+  app.listen(PORT, () => {
+    console.info(`🚀 FarmDirect API running on http://localhost:${PORT}`);
+    console.info(`   ENV: ${process.env.NODE_ENV ?? 'development'}`);
   });
-});
+}
 
-app.listen(port, () => {
-  console.log(`Backend service running on port ${port}`);
+main().catch((err) => {
+  console.error('❌ Failed to start server:', err);
+  process.exit(1);
 });

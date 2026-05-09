@@ -32,7 +32,7 @@ export default function InventoryList({ farmerId }) {
   useEffect(() => {
     if (!farmerId) { setIsLoading(false); return; }
     getInventory()
-      .then(res => setItems(res.data))
+      .then(res => setItems(Array.isArray(res) ? res : []))
       .catch(()  => setItems(null))
       .finally(() => setIsLoading(false));
   }, [farmerId]);

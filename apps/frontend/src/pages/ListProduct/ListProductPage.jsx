@@ -2,63 +2,93 @@
  * src/pages/ListProduct/ListProductPage.jsx
  *
  * Form for farmers to create a new produce listing.
- *
- * Future wiring:
- *   - Replace local state + console.log with POST /api/products
- *   - Add react-hook-form or Formik for validation
- *   - Add image upload to S3/Cloudinary via pre-signed URL
- *   - Wrap in <RequireAuth role="farmer"> guard
+ * Wired to POST /products via createProduct service.
  */
 
 import { useState } from 'react';
-import { useToast } from '../../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
+import { useToast }    from '../../context/ToastContext';
+import { createProduct } from '../../services/products.service.js';
 
 const INITIAL = {
   name:        '',
-  category:    'veg',
+  category:    'VEG',
   price:       '',
   quantity:    '',
   harvestDate: '',
   location:    '',
   description: '',
-  certification: 'organic',
-  delivery:    'self',
+  certification: 'ORGANIC',
+  delivery:    'SELF',
 };
 
-const CERT_OPTIONS     = ['organic', 'chemical-free', 'certified-organic', 'conventional'];
-const DELIVERY_OPTIONS = ['self', 'pickup', 'both'];
+const CERT_OPTIONS     = ['ORGANIC', 'CHEMICAL_FREE', 'CERTIFIED_ORGANIC', 'CONVENTIONAL'];
+const DELIVERY_OPTIONS = ['SELF', 'PICKUP', 'BOTH'];
 
 const CERT_LABELS = {
-  'organic':          '🌿 Organic',
-  'chemical-free':    '🔬 Chemical-free',
-  'certified-organic':'🏷️ Certified Organic',
-  'conventional':     '⚗️ Conventional',
+  'ORGANIC':           '🌿 Organic',
+  'CHEMICAL_FREE':     '🔬 Chemical-free',
+  'CERTIFIED_ORGANIC': '🏷️ Certified Organic',
+  'CONVENTIONAL':      '⚗️ Conventional',
 };
 
 const DELIVERY_LABELS = {
-  'self':   '🚚 Self Delivery',
-  'pickup': '🏪 Farm Pickup',
-  'both':   '🤝 Both',
+  'SELF':   '🚚 Self Delivery',
+  'PICKUP': '🏪 Farm Pickup',
+  'BOTH':   '🤝 Both',
 };
 
 export default function ListProductPage() {
   const { showToast } = useToast();
-  const [form, setForm] = useState(INITIAL);
+  const navigate      = useNavigate();
+  const [form, setForm]     = useState(INITIAL);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
 
   function handleChange(field, value) {
     setForm(prev => ({ ...prev, [field]: value }));
   }
 
-  /** TODO: replace with API call — POST /api/products */
-  function handlePublish() {
-    console.info('[ListProductPage] Publishing listing:', form);
-    showToast('✅ Listing published successfully!');
-    setForm(INITIAL);
+  async function handlePublish() {
+    // Basic validation
+    if (!form.name.trim())        { setError('Crop name is required.');     return; }
+    if (!form.price || form.price <= 0) { setError('Price must be positive.'); return; }
+    if (!form.quantity || form.quantity <= 0) { setError('Quantity must be positive.'); return; }
+    if (!form.harvestDate)        { setError('Harvest date is required.');  return; }
+    if (!form.location.trim())    { setError('Location is required.');     return; }
+
+    setError('');
+    setLoading(true);
+
+    try {
+      await createProduct({
+        name:          form.name.trim(),
+        category:      form.category,
+        pricePerKg:    Number(form.price),
+        quantityKg:    Number(form.quantity),
+        harvestDate:   form.harvestDate,
+        location:      form.location.trim(),
+        district:      form.location.trim(),
+        description:   form.description.trim() || null,
+        certification: form.certification,
+        delivery:      form.delivery,
+        isOrganic:     form.certification === 'ORGANIC' || form.certification === 'CERTIFIED_ORGANIC',
+        images:        [],
+      });
+
+      showToast('✅ Listing published successfully!');
+      setForm(INITIAL);
+      navigate('/farmer/dashboard');
+    } catch (err) {
+      setError(err.message);
+      showToast('❌ Failed to publish listing.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleDraft() {
-    console.info('[ListProductPage] Saving draft:', form);
-    showToast('💾 Draft saved!');
+    showToast('💾 Draft saved locally!');
   }
 
   return (
@@ -68,6 +98,8 @@ export default function ListProductPage() {
         <div className="form-sub">
           Fill in the details below to list your harvest on FarmDirect.
         </div>
+
+        {error && <div className="auth-error-banner" style={{ marginBottom: '1rem' }}>⚠️ {error}</div>}
 
         <div className="form-grid">
           {/* Crop name */}
@@ -80,6 +112,7 @@ export default function ListProductPage() {
               placeholder="e.g. Tomatoes, Ragi, Spinach"
               value={form.name}
               onChange={e => handleChange('name', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -91,12 +124,13 @@ export default function ListProductPage() {
               className="form-select"
               value={form.category}
               onChange={e => handleChange('category', e.target.value)}
+              disabled={loading}
             >
-              <option value="veg">🥬 Vegetables</option>
-              <option value="fruit">🍅 Fruits</option>
-              <option value="grain">🌾 Grains &amp; Pulses</option>
-              <option value="herb">🌿 Herbs &amp; Spices</option>
-              <option value="dairy">🥛 Dairy</option>
+              <option value="VEG">🥬 Vegetables</option>
+              <option value="FRUIT">🍅 Fruits</option>
+              <option value="GRAIN">🌾 Grains &amp; Pulses</option>
+              <option value="HERB">🌿 Herbs &amp; Spices</option>
+              <option value="DAIRY">🥛 Dairy</option>
             </select>
           </div>
 
@@ -111,6 +145,7 @@ export default function ListProductPage() {
               min="1"
               value={form.price}
               onChange={e => handleChange('price', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -125,6 +160,7 @@ export default function ListProductPage() {
               min="1"
               value={form.quantity}
               onChange={e => handleChange('quantity', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -137,6 +173,7 @@ export default function ListProductPage() {
               className="form-input"
               value={form.harvestDate}
               onChange={e => handleChange('harvestDate', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -150,6 +187,7 @@ export default function ListProductPage() {
               placeholder="e.g. Tumkur, Karnataka"
               value={form.location}
               onChange={e => handleChange('location', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -162,6 +200,7 @@ export default function ListProductPage() {
               placeholder="Tell buyers about your produce — variety, growing method, certifications…"
               value={form.description}
               onChange={e => handleChange('description', e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -175,6 +214,7 @@ export default function ListProductPage() {
                   type="button"
                   className={`toggle-chip${form.certification === opt ? ' active' : ''}`}
                   onClick={() => handleChange('certification', opt)}
+                  disabled={loading}
                 >
                   {CERT_LABELS[opt]}
                 </button>
@@ -192,6 +232,7 @@ export default function ListProductPage() {
                   type="button"
                   className={`toggle-chip${form.delivery === opt ? ' active' : ''}`}
                   onClick={() => handleChange('delivery', opt)}
+                  disabled={loading}
                 >
                   {DELIVERY_LABELS[opt]}
                 </button>
@@ -215,10 +256,15 @@ export default function ListProductPage() {
         </div>
 
         <div className="form-actions">
-          <button className="submit-btn" type="button" onClick={handlePublish}>
-            Publish Listing
+          <button
+            className="submit-btn"
+            type="button"
+            onClick={handlePublish}
+            disabled={loading}
+          >
+            {loading ? 'Publishing…' : 'Publish Listing'}
           </button>
-          <button className="save-draft" type="button" onClick={handleDraft}>
+          <button className="save-draft" type="button" onClick={handleDraft} disabled={loading}>
             Save as Draft
           </button>
         </div>

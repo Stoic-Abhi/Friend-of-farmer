@@ -5,6 +5,7 @@
  * Driven by a config array so adding a new tab is a one-liner.
  */
 
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 const FARMER_TABS = [

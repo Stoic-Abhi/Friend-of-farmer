@@ -6,8 +6,9 @@
  * When react-router is added, replace `onNavigate` calls with <Link> or useNavigate().
  */
 import { useNavigate } from 'react-router-dom';
-import { useCart }     from '../../context/CartContext.jsx';
-import { useAuth }     from '../../context/AuthContext.jsx';
+import { useCart }          from '../../context/CartContext.jsx';
+import { useAuth }          from '../../context/AuthContext.jsx';
+import NotificationBell     from '../notifications/NotificationBell.jsx';
 
 export default function Navbar({ onCartOpen }) {
   const { totalCount }         = useCart();
@@ -34,6 +35,7 @@ export default function Navbar({ onCartOpen }) {
       </div>
 
       <div className="nav-actions">
+        {isLoggedIn && <NotificationBell />}
         {isLoggedIn && user?.role === 'CONSUMER' && (
           <button className="btn-outline" onClick={onCartOpen}>
             🛒 Cart

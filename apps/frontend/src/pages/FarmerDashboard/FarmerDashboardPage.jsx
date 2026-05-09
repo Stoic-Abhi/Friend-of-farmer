@@ -1,7 +1,7 @@
 /**
- * src/pages/ConsumerDashboard/ConsumerDashboardPage.jsx
+ * src/pages/FarmerDashboard/FarmerDashboardPage.jsx
  *
- * Consumer's personal dashboard: order history + saved farmers.
+ * Farmer's personal dashboard: KPI stats, order list, inventory.
  *
  * Future wiring:
  *   - Replace SEED_ORDERS with GET /api/consumer/:id/orders

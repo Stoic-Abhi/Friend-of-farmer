@@ -5,78 +5,83 @@
  * Fully controlled — all state lives in BrowsePage.
  */
 
-import { useNavigate } from 'react-router-dom';
-import { useCart }     from '../../context/CartContext.jsx';
-import { useToast }    from '../../context/ToastContext.jsx';
-import { useAuth }     from '../../context/AuthContext.jsx';
+import { LOCATIONS, CATEGORIES, SORT_OPTIONS } from '../../data/products';
 
-const CATEGORY_EMOJI = { VEG:'🥬', FRUIT:'🍅', GRAIN:'🌾', HERB:'🌿', DAIRY:'🥛' };
-const CAT_BG         = { VEG:'#f0f8ee', FRUIT:'#fff0ee', GRAIN:'#fdf8ee', HERB:'#f5fbf5', DAIRY:'#f0f4ff' };
-
-function freshnessLabel(days) {
-  if (days === 0) return '🌟 Just Harvested';
-  if (days === 1) return '✨ 1 day ago';
-  return `📅 ${days} days ago`;
-}
-
-export default function ProductCard({ product }) {
-  const { addToCart }  = useCart();
-  const { showToast }  = useToast();
-  const { user }       = useAuth();
-  const navigate       = useNavigate();
-
-  // Normalise API shape vs seed shape
-  const price      = product.pricePerKg  ?? product.price;
-  const days       = product.harvestDays ?? product.harvest ?? 0;
-  const rating     = product.avgRating   ?? product.rating;
-  const reviews    = product.reviewCount ?? product.reviews;
-  const isOrganic  = product.isOrganic   ?? product.organic;
-  const hasDelivery= product.delivery === 'SELF' || product.delivery === 'BOTH' || product.delivery === true;
-  const catKey     = (product.category ?? 'VEG').toUpperCase();
-  const emoji      = CATEGORY_EMOJI[catKey] ?? '🌾';
-  const bg         = product.bg ?? CAT_BG[catKey] ?? '#fdf8ee';
-  const farmerName = product.farmer?.email ?? product.farmer ?? '';
-  const location   = product.district ?? product.loc ?? '';
-
-  function handleAddToCart(e) {
-    e.stopPropagation();
-    if (user?.role === 'FARMER') { showToast('⚠️ Farmers cannot place orders.'); return; }
-    addToCart({ ...product, emoji, pricePerKg: price, price });
-    showToast(`🛒 ${emoji} ${product.name} added to cart!`);
-  }
-
+/**
+ * @param {{
+ *   query:            string,
+ *   location:         string,
+ *   sort:             string,
+ *   activeFilter:     string,
+ *   onQueryChange:    (v: string) => void,
+ *   onLocationChange: (v: string) => void,
+ *   onSortChange:     (v: string) => void,
+ *   onFilterChange:   (v: string) => void,
+ * }} props
+ */
+export default function ProductFilters({
+  query, location, sort, activeFilter,
+  onQueryChange, onLocationChange, onSortChange, onFilterChange,
+}) {
   return (
-    <div className="product-card" onClick={() => navigate(`/products/${product.id}`)}>
-      <div className="product-img" style={{ background: bg }}>
-        <span className="product-img-emoji">{emoji}</span>
-        {isOrganic && <div className="organic-badge">Organic</div>}
-        <div className={`freshness-badge ${days <= 1 ? 'fresh' : 'recent'}`}>
-          {freshnessLabel(days)}
+    <div className="filters-wrapper">
+      {/* Search + dropdowns row */}
+      <div className="filters-bar">
+        <div className="search-box">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search produce or farmer…"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+          />
+          {query && (
+            <button
+              className="search-clear"
+              onClick={() => onQueryChange('')}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
+
+        <select
+          className="filter-select"
+          value={location}
+          onChange={(e) => onLocationChange(e.target.value)}
+          aria-label="Filter by location"
+        >
+          <option value="">📍 All Locations</option>
+          {LOCATIONS.map((loc) => (
+            <option key={loc} value={loc}>{loc}</option>
+          ))}
+        </select>
+
+        <select
+          className="filter-select"
+          value={sort}
+          onChange={(e) => onSortChange(e.target.value)}
+          aria-label="Sort products"
+        >
+          {SORT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
       </div>
 
-      <div className="product-body">
-        <div className="product-name">{product.name}</div>
-        <div className="product-farmer">
-          by <a onClick={e => { e.stopPropagation(); }}>{farmerName}</a>
-          {location && ` · ${location}`}
-        </div>
-        {rating && (
-          <div className="rating-row">
-            <span className="stars">{'⭐'.repeat(Math.round(rating))}</span>
-            <span className="rating-count">{rating} ({reviews})</span>
-          </div>
-        )}
-        <div className="product-meta">
-          <div className="product-price">₹{price} <span>/ kg</span></div>
-          <div className="product-loc">{hasDelivery ? '🚚 Delivery' : '🏪 Pickup'}</div>
-        </div>
-        <div className="product-avail">📦 {product.quantityKg ?? product.qty} kg available</div>
-      </div>
-
-      <div className="product-footer">
-        <button className="add-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
-        <button className="wishlist-btn" onClick={e => e.stopPropagation()} aria-label="Save">♡</button>
+      {/* Category pills */}
+      <div className="filter-pills">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat.key}
+            className={`filter-pill${activeFilter === cat.key ? ' active' : ''}`}
+            onClick={() => onFilterChange(cat.key)}
+          >
+            {cat.label}
+          </button>
+        ))}
       </div>
     </div>
   );

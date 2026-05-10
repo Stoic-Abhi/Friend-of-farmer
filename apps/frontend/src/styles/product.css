@@ -2,6 +2,84 @@
    Product Cards, Filters & Cart Drawer
 ───────────────────────────────────────────── */
 
+/* ── Filters wrapper ── */
+.filters-wrapper {
+  margin-bottom: 2rem;
+}
+
+.filters-bar {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  border: 1.5px solid rgba(92, 61, 46, 0.12);
+}
+
+.search-box {
+  flex: 2;
+  min-width: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.search-box .search-input {
+  width: 100%;
+  padding-left: 36px;
+  padding-right: 32px;
+}
+
+.search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.search-clear:hover { color: var(--soil); }
+
+.filter-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-pill {
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1.5px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+  color: var(--earth);
+}
+.filter-pill.active,
+.filter-pill:hover {
+  background: var(--leaf);
+  color: white;
+  border-color: var(--leaf);
+}
+
 /* ── Search / Filter bar ── */
 .search-zone {
   background: white;

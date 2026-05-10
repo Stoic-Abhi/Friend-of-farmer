@@ -1,16 +1,20 @@
 import { defineConfig } from 'vite'
-// import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-// import babel from '@rolldown/plugin-babel'
 import react from '@vitejs/plugin-react'
 
-// export default defineConfig({
-//   plugins: [
-//     react(),
-//     babel({ presets: [reactCompilerPreset()] })
-//   ],
-//   base: '/'
-// })
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/'
+  base: '/',
+
+  // Proxy API requests to Express backend in dev
+  server: {
+    proxy: {
+      '/auth':          { target: 'http://localhost:4000', changeOrigin: true },
+      '/products':      { target: 'http://localhost:4000', changeOrigin: true },
+      '/orders':        { target: 'http://localhost:4000', changeOrigin: true },
+      '/farmers':       { target: 'http://localhost:4000', changeOrigin: true },
+      '/notifications': { target: 'http://localhost:4000', changeOrigin: true },
+      '/health':        { target: 'http://localhost:4000', changeOrigin: true },
+    },
+  },
 })

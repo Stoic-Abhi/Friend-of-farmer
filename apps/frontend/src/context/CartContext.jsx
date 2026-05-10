@@ -3,27 +3,28 @@
  *
  * Global cart state via React Context + useReducer.
  *
- * Future backend wiring points (marked TODO):
- *   - POST /api/orders  on checkout
- *   - GET  /api/cart/:userId  to hydrate cart on login
+ * checkout(deliveryAddress) maps cart items → POST /orders
+ * and clears the cart on success.
  */
 
 import { createContext, useContext, useReducer, useCallback } from 'react';
-import { DELIVERY_FEE } from '../data/products';
+import { placeOrder } from '../services/orders.service.js';
+
+const DELIVERY_FEE = 30;
 
 /* ── Shape ────────────────────────────────── */
 /**
  * @typedef {Object} CartItem
- * @property {number} id
+ * @property {string} id          - product UUID
  * @property {string} name
  * @property {string} emoji
  * @property {string} farmer
- * @property {number} price
- * @property {number} count
+ * @property {number} pricePerKg
+ * @property {number} count       - quantity in kg
  */
 
 const initialState = {
-  /** @type {Object.<number, CartItem>} */
+  /** @type {Object.<string, CartItem>} */
   items: {},
 };
 
@@ -38,12 +39,13 @@ function cartReducer(state, action) {
         items: {
           ...state.items,
           [product.id]: {
-            id:     product.id,
-            name:   product.name,
-            emoji:  product.emoji,
-            farmer: product.farmer,
-            price:  product.price,
-            count:  (existing?.count ?? 0) + 1,
+            id:         product.id,
+            name:       product.name,
+            emoji:      product.emoji,
+            farmer:     product.farmer,
+            pricePerKg: product.pricePerKg ?? product.price,
+            price:      product.pricePerKg ?? product.price,
+            count:      (existing?.count ?? 0) + 1,
           },
         },
       };
@@ -85,7 +87,7 @@ export function CartProvider({ children }) {
 
   const cartItems  = Object.values(state.items).filter(i => i.count > 0);
   const totalCount = cartItems.reduce((sum, i) => sum + i.count, 0);
-  const subtotal   = cartItems.reduce((sum, i) => sum + i.price * i.count, 0);
+  const subtotal   = cartItems.reduce((sum, i) => sum + (i.pricePerKg ?? i.price) * i.count, 0);
   const total      = subtotal + (cartItems.length ? DELIVERY_FEE : 0);
 
   const addToCart  = useCallback((product) => dispatch({ type: 'ADD', product }), []);
@@ -93,12 +95,24 @@ export function CartProvider({ children }) {
   const removeItem = useCallback((id) => dispatch({ type: 'REMOVE', id }), []);
 
   /**
-   * TODO: replace with → await api.post('/orders', { items: cartItems, paymentMethod: 'COD' })
+   * Place order via POST /orders.
+   * Maps cart items to { productId, quantityKg } and sends deliveryAddress.
+   * @param {string} deliveryAddress
+   * @returns {{ success: boolean, order?: object, error?: string }}
    */
-  const checkout = useCallback(async () => {
-    await new Promise(r => setTimeout(r, 600));
-    dispatch({ type: 'CLEAR' });
-    return { success: true };
+  const checkout = useCallback(async (deliveryAddress = '') => {
+    try {
+      const items = cartItems.map(item => ({
+        productId:  item.id,
+        quantityKg: item.count,
+      }));
+
+      const order = await placeOrder({ items, deliveryAddress });
+      dispatch({ type: 'CLEAR' });
+      return { success: true, order };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }, [cartItems]);
 
   return (

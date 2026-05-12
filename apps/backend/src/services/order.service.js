@@ -1,6 +1,7 @@
 // src/services/order.service.js
 
 import prisma from '../config/prisma.js';
+import { notifyOrderPlaced, notifyLowStock, notifyStatusChanged } from './notification.service.js';
 
 const DELIVERY_FEE = 30;
 
@@ -34,7 +35,7 @@ export async function placeOrder(consumerId, { items, deliveryAddress }) {
   const totalRs    = Number((subtotalRs + DELIVERY_FEE).toFixed(2));
 
   // Atomic: create order, decrement inventory
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
       data: {
         consumerId,
@@ -44,7 +45,7 @@ export async function placeOrder(consumerId, { items, deliveryAddress }) {
         deliveryAddress,
         items: { create: lineItems },
       },
-      include: { items: { include: { product: { select: { id: true, name: true } } } } },
+      include: { items: { include: { product: { select: { id: true, name: true, farmerId: true } } } } },
     });
 
     for (const item of lineItems) {
@@ -54,8 +55,21 @@ export async function placeOrder(consumerId, { items, deliveryAddress }) {
       });
     }
 
+    // Check for low stock after decrement
+    for (const item of lineItems) {
+      const product = await tx.product.findUnique({ where: { id: item.productId } });
+      if (product && product.quantityKg <= 5) {
+        notifyLowStock(product).catch(console.error);
+      }
+    }
+
     return order;
   });
+
+  // Fire-and-forget: notify farmers and consumer
+  notifyOrderPlaced(result).catch(console.error);
+
+  return result;
 }
 
 /* ── Consumer: my orders ─────────────────────────────────────── */
@@ -114,5 +128,10 @@ export async function updateOrderStatus(orderId, farmerId, status) {
   });
   if (!order) throw Object.assign(new Error('Order not found or forbidden.'), { status: 404 });
 
-  return prisma.order.update({ where: { id: orderId }, data: { status } });
+  const updated = await prisma.order.update({ where: { id: orderId }, data: { status } });
+
+  // Fire-and-forget: notify consumer of status change
+  notifyStatusChanged(updated).catch(console.error);
+
+  return updated;
 }

@@ -7,7 +7,8 @@ import cookieParser from 'cookie-parser';
 import authRoutes    from './routes/auth.routes.js';
 import productRoutes from './routes/product.routes.js';
 import orderRoutes   from './routes/order.routes.js';
-import farmerRoutes  from './routes/farmer.routes.js';
+import farmerRoutes       from './routes/farmer.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 
@@ -22,7 +23,8 @@ app.use(cookieParser());
 app.use('/auth',     authRoutes);
 app.use('/products', productRoutes);
 app.use('/orders',   orderRoutes);
-app.use('/farmers',  farmerRoutes);
+app.use('/farmers',        farmerRoutes);
+app.use('/notifications',  notificationRoutes);
 
 app.get('/health', (_req, res) =>
   res.json({ ok: true, ts: new Date().toISOString() })

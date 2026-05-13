@@ -1,0 +1,186 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FARMER
+  CONSUMER
+}
+
+enum Category {
+  VEG
+  FRUIT
+  GRAIN
+  HERB
+  DAIRY
+}
+
+enum Certification {
+  ORGANIC
+  CHEMICAL_FREE
+  CERTIFIED_ORGANIC
+  CONVENTIONAL
+}
+
+enum DeliveryOption {
+  SELF
+  PICKUP
+  BOTH
+}
+
+enum OrderStatus {
+  PENDING
+  PACKED
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String?  @unique
+  phone      String?  @unique
+  password   String
+  isVerified Boolean  @default(false)
+  role       Role?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  products     Product[]
+  orders       Order[]
+  reviews      Review[]
+  savedFarmers   SavedFarmer[]   @relation("ConsumerSaved")
+  savedBy        SavedFarmer[]   @relation("FarmerSaved")
+  notifications  Notification[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+enum NotificationType {
+  ORDER_PLACED
+  ORDER_STATUS_CHANGED
+  REVIEW_RECEIVED
+  LOW_STOCK
+  GENERAL
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Otp {
+  id         String   @id @default(uuid())
+  identifier String
+  otp        String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+}
+
+model Product {
+  id            String         @id @default(uuid())
+  farmerId      String
+  farmer        User           @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  name          String
+  category      Category
+  pricePerKg    Float
+  quantityKg    Float
+  harvestDate   DateTime
+  location      String
+  district      String
+  description   String?
+  certification Certification  @default(CONVENTIONAL)
+  delivery      DeliveryOption @default(PICKUP)
+  isOrganic     Boolean        @default(false)
+  isActive      Boolean        @default(true)
+  images        String[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  orderItems    OrderItem[]
+  reviews       Review[]
+
+  @@index([farmerId])
+  @@index([category])
+  @@index([district])
+  @@index([isActive])
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  consumerId      String
+  consumer        User          @relation(fields: [consumerId], references: [id])
+  status          OrderStatus   @default(PENDING)
+  paymentMethod   PaymentMethod @default(COD)
+  deliveryAddress String?
+  subtotalRs      Float
+  deliveryFeeRs   Float         @default(30)
+  totalRs         Float
+  items           OrderItem[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([consumerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  quantityKg Float
+  pricePerKg Float
+  subtotalRs Float
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  reviewerId String
+  reviewer   User     @relation(fields: [reviewerId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@unique([reviewerId, productId])
+  @@index([productId])
+}
+
+model SavedFarmer {
+  id         String @id @default(uuid())
+  consumerId String
+  consumer   User   @relation("ConsumerSaved", fields: [consumerId], references: [id], onDelete: Cascade)
+  farmerId   String
+  farmer     User   @relation("FarmerSaved",   fields: [farmerId],   references: [id], onDelete: Cascade)
+
+  @@unique([consumerId, farmerId])
+  @@index([consumerId])
+}

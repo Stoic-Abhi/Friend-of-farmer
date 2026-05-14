@@ -24,7 +24,12 @@ export default function SelectRolePage() {
     setLoading(true);
     try {
       const user = await setRole(selected);
-      navigate(user?.role === 'FARMER' ? '/farmer/dashboard' : '/browse', { replace: true });
+      // If profile already exists (returning user), go to dashboard; otherwise setup
+      if (user?.profile?.displayName) {
+        navigate(user?.role === 'FARMER' ? '/farmer/dashboard' : '/browse', { replace: true });
+      } else {
+        navigate('/profile/setup', { replace: true });
+      }
     } catch (err) {
       setError(err.message);
     } finally {

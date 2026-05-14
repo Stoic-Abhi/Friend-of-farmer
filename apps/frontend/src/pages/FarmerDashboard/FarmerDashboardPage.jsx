@@ -54,8 +54,14 @@ export default function FarmerDashboardPage() {
     <div className="dashboard">
       <div className="dash-header">
         <div>
-          <div className="dash-greeting">🙏 Namaskara, {identifier}</div>
-          <div className="dash-sub">Farmer Dashboard</div>
+          <div className="dash-greeting">
+            🙏 Namaskara, {user?.profile?.displayName ?? identifier}
+          </div>
+          {user?.profile?.district ? (
+            <div className="dash-sub">📍 {user.profile.district} · Farmer Dashboard</div>
+          ) : (
+            <div className="dash-sub">Farmer Dashboard</div>
+          )}
         </div>
         <button className="submit-btn" onClick={() => navigate('/list-product')}>
           + Add Listing

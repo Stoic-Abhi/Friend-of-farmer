@@ -2,8 +2,7 @@
  * src/components/layout/Navbar.jsx
  *
  * Sticky top navigation bar.
- * Receives `onNavigate` and `onCartOpen` to stay decoupled from router.
- * When react-router is added, replace `onNavigate` calls with <Link> or useNavigate().
+ * Shows display name + account link for logged-in users.
  */
 import { useNavigate } from 'react-router-dom';
 import { useCart }          from '../../context/CartContext.jsx';
@@ -14,6 +13,10 @@ export default function Navbar({ onCartOpen }) {
   const { totalCount }         = useCart();
   const { isLoggedIn, user, logout } = useAuth();
   const navigate               = useNavigate();
+
+  const displayLabel = user?.profile?.displayName
+    ?? user?.email?.split('@')[0]
+    ?? 'Account';
 
   return (
     <nav className="navbar">
@@ -44,7 +47,12 @@ export default function Navbar({ onCartOpen }) {
         )}
 
         {isLoggedIn ? (
-          <button className="btn-outline" onClick={logout}>Sign Out</button>
+          <>
+            <button className="nav-avatar-btn" onClick={() => navigate('/account')}>
+              👤 {displayLabel}
+            </button>
+            <button className="btn-outline" onClick={logout}>Sign Out</button>
+          </>
         ) : (
           <>
             <button className="btn-outline" onClick={() => navigate('/login')}>Sign In</button>

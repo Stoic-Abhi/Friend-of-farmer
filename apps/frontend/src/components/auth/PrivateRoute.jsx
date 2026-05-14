@@ -1,17 +1,20 @@
 // src/components/auth/PrivateRoute.jsx
-// Production-ready route guard with role checking.
+// Production-ready route guard with role + profile checking.
 
 import { Navigate } from 'react-router-dom';
 import { useAuth }  from '../../context/AuthContext.jsx';
 
 /**
  * @param {{
- *   children:       React.ReactNode,
- *   requireRole?:   'FARMER' | 'CONSUMER',
- *   skipRoleCheck?: boolean,   // allow access even without role (select-role page)
+ *   children:         React.ReactNode,
+ *   requireRole?:     'FARMER' | 'CONSUMER',
+ *   skipRoleCheck?:   boolean,   // allow access even without role (select-role page)
+ *   requireProfile?:  boolean,   // redirect to /profile/setup if no displayName
  * }} props
  */
-export default function PrivateRoute({ children, requireRole, skipRoleCheck = false }) {
+export default function PrivateRoute({
+  children, requireRole, skipRoleCheck = false, requireProfile = false,
+}) {
   const { isLoading, isLoggedIn, user } = useAuth();
 
   // Still hydrating from cookie — show nothing to prevent flash
@@ -37,6 +40,11 @@ export default function PrivateRoute({ children, requireRole, skipRoleCheck = fa
   // Role mismatch
   if (requireRole && user?.role !== requireRole) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Profile required but incomplete
+  if (requireProfile && !user?.profile?.displayName) {
+    return <Navigate to="/profile/setup" replace />;
   }
 
   return children;

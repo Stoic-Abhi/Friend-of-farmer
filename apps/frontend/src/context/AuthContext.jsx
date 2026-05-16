@@ -7,25 +7,30 @@
  *   mount → GET /auth/me → BOOTSTRAP_DONE(user|null)
  *   OTP verified → finishOtpVerification() → GET /auth/me → LOGIN_SUCCESS(user)
  *   role selected → setRole(role) → POST /auth/select-role + GET /auth/me → LOGIN_SUCCESS(user)
+ *   profile updated → updateUserProfile(data) → PATCH /profile/me → PROFILE_UPDATED(profile)
+ *   geo updated → GEO_UPDATED({ latitude, longitude, ... })
  *   logout → POST /auth/logout → LOGOUT
  *
- * Exposes: { user, isLoggedIn, isLoading, finishOtpVerification, setRole, logout }
+ * Exposes: { user, isLoggedIn, isLoading, finishOtpVerification, setRole, logout, updateUserProfile }
  */
 
 import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
-import * as authService from '../services/auth.service.js';
+import * as authService    from '../services/auth.service.js';
+import * as profileService from '../services/profile.service.js';
 
 /* ── State shape ── */
 const initialState = {
-  user:       null,   // { id, email, phone, role, isVerified, createdAt }
+  user:       null,   // { id, email, phone, role, isVerified, createdAt, profile: {...}|null }
   isLoggedIn: false,
   isLoading:  true,   // true until initial GET /auth/me resolves
 };
 
 /* ── Actions ── */
-const BOOTSTRAP_DONE = 'BOOTSTRAP_DONE';
-const LOGIN_SUCCESS  = 'LOGIN_SUCCESS';
-const LOGOUT         = 'LOGOUT';
+const BOOTSTRAP_DONE   = 'BOOTSTRAP_DONE';
+const LOGIN_SUCCESS    = 'LOGIN_SUCCESS';
+const LOGOUT           = 'LOGOUT';
+const PROFILE_UPDATED  = 'PROFILE_UPDATED';
+const GEO_UPDATED      = 'GEO_UPDATED';
 
 function authReducer(state, action) {
   switch (action.type) {
@@ -51,6 +56,21 @@ function authReducer(state, action) {
         user:       null,
         isLoggedIn: false,
         isLoading:  false,
+      };
+
+    case PROFILE_UPDATED:
+      return {
+        ...state,
+        user: { ...state.user, profile: action.profile },
+      };
+
+    case GEO_UPDATED:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          profile: { ...state.user?.profile, ...action.geo },
+        },
       };
 
     default:
@@ -96,6 +116,25 @@ export function AuthProvider({ children }) {
   }, []);
 
   /**
+   * Update user profile — Navbar, dashboards, etc. see the change immediately.
+   * @param {object} data - profile fields to update
+   * @returns {Promise<object>} updated profile
+   */
+  const updateUserProfile = useCallback(async (data) => {
+    const profile = await profileService.updateProfile(data);
+    dispatch({ type: PROFILE_UPDATED, profile });
+    return profile;
+  }, []);
+
+  /**
+   * Update geolocation in state (fire-and-forget PATCH already sent).
+   * @param {{ latitude, longitude, geoAccuracy, geoUpdatedAt }} geo
+   */
+  const updateGeoInState = useCallback((geo) => {
+    dispatch({ type: GEO_UPDATED, geo });
+  }, []);
+
+  /**
    * Log out: clear session cookie + reset state.
    */
   const logout = useCallback(async () => {
@@ -116,6 +155,8 @@ export function AuthProvider({ children }) {
         finishOtpVerification,
         setRole,
         logout,
+        updateUserProfile,
+        updateGeoInState,
       }}
     >
       {children}

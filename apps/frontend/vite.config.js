@@ -14,6 +14,7 @@ export default defineConfig({
       '/orders':        { target: 'http://localhost:4000', changeOrigin: true },
       '/farmers':       { target: 'http://localhost:4000', changeOrigin: true },
       '/notifications': { target: 'http://localhost:4000', changeOrigin: true },
+      '/profile':       { target: 'http://localhost:4000', changeOrigin: true },
       '/health':        { target: 'http://localhost:4000', changeOrigin: true },
     },
   },

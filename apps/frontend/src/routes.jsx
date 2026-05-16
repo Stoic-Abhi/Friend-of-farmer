@@ -1,26 +1,7 @@
 /**
  * src/routes.jsx
  *
- * Central route registry.
- *
- * Currently used as a config map for the manual view switcher in App.jsx.
- *
- * ── Upgrading to React Router v6 ──────────────────────────────
- * When you install react-router-dom, replace App.jsx's manual switcher
- * with <BrowserRouter> + <Routes> and use the `path` field below:
- *
- *   import { BrowserRouter, Routes, Route } from 'react-router-dom';
- *
- *   <BrowserRouter>
- *     <Routes>
- *       {ROUTES.map(r => (
- *         <Route key={r.id} path={r.path} element={<r.component />} />
- *       ))}
- *     </Routes>
- *   </BrowserRouter>
- *
- * Then replace every `onNavigate(id)` call with `useNavigate()(path)`.
- * ─────────────────────────────────────────────────────────────
+ * Central route registry using React Router v6 createBrowserRouter.
  */
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth }  from './context/AuthContext.jsx';
@@ -32,6 +13,10 @@ import LoginPage      from './pages/auth/LoginPage.jsx';
 import SignupPage     from './pages/auth/SignupPage.jsx';
 import VerifyOtpPage  from './pages/auth/VerifyOtpPage.jsx';
 import SelectRolePage from './pages/auth/SelectRolePage.jsx';
+
+// Profile pages
+import ProfileSetupPage from './pages/Profile/ProfileSetupPage.jsx';
+import AccountPage      from './pages/Profile/AccountPage.jsx';
 
 // App pages
 import BrowsePage            from './pages/Browse/BrowsePage.jsx';
@@ -58,6 +43,16 @@ export const router = createBrowserRouter([
     element: (
       <PrivateRoute skipRoleCheck>
         <SelectRolePage />
+      </PrivateRoute>
+    ),
+  },
+
+  // Profile setup (needs login + role, but profile not yet complete)
+  {
+    path: '/profile/setup',
+    element: (
+      <PrivateRoute>
+        <ProfileSetupPage />
       </PrivateRoute>
     ),
   },
@@ -97,6 +92,10 @@ export const router = createBrowserRouter([
             <ConsumerDashboardPage />
           </PrivateRoute>
         ),
+      },
+      {
+        path: 'account',
+        element: <AccountPage />,
       },
     ],
   },

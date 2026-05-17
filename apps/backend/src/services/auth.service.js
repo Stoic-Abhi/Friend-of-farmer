@@ -207,7 +207,11 @@ export async function selectRole({ userId, role }) {
 export async function getMe(userId) {
   const user = await prisma.user.findUnique({
     where:  { id: userId },
-    select: { id: true, email: true, phone: true, role: true, isVerified: true, createdAt: true },
+    select: {
+      id: true, email: true, phone: true, role: true,
+      isVerified: true, createdAt: true,
+      profile: true,
+    },
   });
 
   if (!user) throw Object.assign(new Error('User not found.'), { status: 404 });

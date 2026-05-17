@@ -57,12 +57,14 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  products     Product[]
-  orders       Order[]
-  reviews      Review[]
-  savedFarmers   SavedFarmer[]   @relation("ConsumerSaved")
-  savedBy        SavedFarmer[]   @relation("FarmerSaved")
-  notifications  Notification[]
+  products         Product[]
+  orders           Order[]
+  reviews          Review[]
+  savedFarmers     SavedFarmer[]          @relation("ConsumerSaved")
+  savedBy          SavedFarmer[]          @relation("FarmerSaved")
+  notifications    Notification[]
+  profile          UserProfile?
+  certifications   FarmerCertification[]
 
   @@index([email])
   @@index([phone])
@@ -87,6 +89,73 @@ model Notification {
 
   @@index([userId])
   @@index([isRead])
+}
+
+model UserProfile {
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Shared fields
+  displayName  String?
+  avatarUrl    String?
+  bio          String?
+
+  // Address
+  addressLine  String?
+  landmark     String?
+  district     String?
+  state        String?
+  pincode      String?
+
+  // Geolocation
+  latitude     Float?
+  longitude    Float?
+  geoAccuracy  Float?
+  geoUpdatedAt DateTime?
+
+  // Farmer-specific
+  landSizeHa   Float?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum CertificationType {
+  ORGANIC_NPOP
+  ORGANIC_PGS
+  FSSAI
+  APEDA
+  GOOD_AGRICULTURAL_PRACTICE
+  ISO_22000
+  OTHER
+}
+
+enum CertStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+model FarmerCertification {
+  id           String            @id @default(uuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  certType     CertificationType
+  certName     String
+  issuedBy     String?
+  certNumber   String?
+  issuedAt     DateTime?
+  expiresAt    DateTime?
+  documentUrl  String
+  status       CertStatus        @default(PENDING)
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([userId])
 }
 
 model Otp {

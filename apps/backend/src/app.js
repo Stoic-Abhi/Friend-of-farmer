@@ -9,6 +9,7 @@ import productRoutes from './routes/product.routes.js';
 import orderRoutes   from './routes/order.routes.js';
 import farmerRoutes       from './routes/farmer.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import profileRoutes      from './routes/profile.routes.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/products', productRoutes);
 app.use('/orders',   orderRoutes);
 app.use('/farmers',        farmerRoutes);
 app.use('/notifications',  notificationRoutes);
+app.use('/profile',        profileRoutes);
 
 app.get('/health', (_req, res) =>
   res.json({ ok: true, ts: new Date().toISOString() })
